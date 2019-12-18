@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1089705458141",
+    "firebase_url": "https://flutter-insta-clone-8290b.firebaseio.com",
+    "project_id": "flutter-insta-clone-8290b",
+    "storage_bucket": "flutter-insta-clone-8290b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089705458141:android:431bde03bc681b617d1e34",
+        "android_client_info": {
+          "package_name": "com.example.insta_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1089705458141-5bsf5qukbe2nb72v7fbq0duee69bi9j4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnY43jB-tofjk9BEdC_YP-pp8Ndh3Fc_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1089705458141-5bsf5qukbe2nb72v7fbq0duee69bi9j4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
