@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:insta_clone/screens/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+
+static final String id = 'login_screen';
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -28,7 +32,7 @@ _submit(){
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text('Instgram', 
+            Text('Instagram', 
             style: TextStyle(fontFamily:'Billabong',
             fontSize: 50.0,
             ),
@@ -71,6 +75,20 @@ _submit(){
                   color: Colors.blue,
                   padding: EdgeInsets.all(10.0),
                   child: Text('Login', style: TextStyle(
+                  color: Colors.white, 
+                  fontSize: 10.0
+                  ),
+                  ),
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                Container(
+                  width: 250,
+                  child: FlatButton(
+                  onPressed: () => Navigator.pushNamed(context, SignupScreen.id), 
+                  color: Colors.blue,
+                  padding: EdgeInsets.all(10.0),
+                  child: Text('Signup', style: TextStyle(
                   color: Colors.white, 
                   fontSize: 10.0
                   ),
