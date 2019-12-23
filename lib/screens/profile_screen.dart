@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_clone/models/user_model.dart';
 import 'package:insta_clone/screens/edit_profile_screen.dart';
@@ -38,7 +39,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: <Widget>[
               CircleAvatar(
                 radius: 50.0,
-                backgroundImage: NetworkImage('https://avatars2.githubusercontent.com/u/33100167?s=460&v=4'),
+                backgroundImage: user.profileImageUrl.isEmpty 
+                ? AssetImage('assets/images/user_placeholder.jpg') 
+                : CachedNetworkImageProvider(user.profileImageUrl),
+                backgroundColor: Colors.grey,
               ),
               Expanded(
               child: Column(

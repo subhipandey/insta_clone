@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:insta_clone/models/user_model.dart';
 import 'package:insta_clone/services/database_service.dart';
+import 'package:insta_clone/services/storage_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   
@@ -16,6 +21,7 @@ final User user;
 class _EditProfileScreenState extends State<EditProfileScreen> {
 
 final _formKey = GlobalKey<FormState>();
+File _profileImage;
 String _name = '';
 String _bio = ''; 
 
@@ -27,11 +33,49 @@ void initState(){
     _bio = widget.user.bio;
 }
 
-_submit(){
+_handleImageFromGallery() async {
+File imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+if (imageFile != null) {
+  setState(() {
+    _profileImage = imageFile;
+  });
+
+}
+}
+
+_displayProfileImage() {
+
+  if (_profileImage == null) {
+
+if (widget.user.profileImageUrl.isEmpty) {
+
+   return AssetImage('assets/images/user_placeholder.jpg');
+} else {
+
+  return CachedNetworkImageProvider(widget.user.profileImageUrl);
+}
+  }else{
+    return FileImage(_profileImage);
+  }
+}
+
+
+_submit() async{
 
   if (_formKey.currentState.validate()){
     _formKey.currentState.save();
     String _profileImageUrl = '';
+
+
+    if(_profileImage == null) {
+      _profileImageUrl = widget.user.profileImageUrl;
+    } else {
+
+      _profileImageUrl = await StorageService.uploadUserProfileImage(
+        widget.user.profileImageUrl, 
+        _profileImage,
+        );
+    }
     User user = User(
       id: widget.user.id, 
       name: _name, 
@@ -64,10 +108,12 @@ _submit(){
                 key: _formKey,
                 child: Column(children: <Widget>[
                   CircleAvatar(radius: 60.0,
-                  backgroundImage: NetworkImage('https://avatars2.githubusercontent.com/u/33100167?s=460&v=4'),
+                  backgroundColor: Colors.grey,
+                  backgroundImage: 
+                       _displayProfileImage(),
                   ),
                 FlatButton(
-                  onPressed: () => print('Change Profile Image'),
+                  onPressed: () => _handleImageFromGallery,
                   child: Text(
                     'Change Profile Image', 
                     style: TextStyle(
