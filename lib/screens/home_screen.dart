@@ -34,17 +34,7 @@ int _currentTab = 0;
   @override
    Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-          'Instagram',
-          style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Billabong',
-            fontSize: 35.0,
-          ),
-        ),
-      ),
+      
       body: PageView(
         controller: _pageController,
         children: <Widget>[
@@ -52,7 +42,7 @@ int _currentTab = 0;
           SearchScreen(),
           CreatePostScreen(),
           ActivityScreen(),
-          ProfileScreen(),
+          ProfileScreen(userId: widget.userId,),
         ],
         onPageChanged: (int index) {
           setState(() {
