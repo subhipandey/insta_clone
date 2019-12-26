@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:insta_clone/models/user_data.dart';
 import 'package:insta_clone/screens/activity_screen.dart';
 import 'package:insta_clone/screens/create_post_screen.dart';
 import 'package:insta_clone/screens/feed_screen.dart';
 import 'package:insta_clone/screens/profile_screen.dart';
 import 'package:insta_clone/screens/search_screen.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
 
-final String userId;
 
-HomeScreen({this.userId});
 
 
   @override
@@ -33,6 +33,7 @@ int _currentTab = 0;
 
   @override
    Widget build(BuildContext context) {
+     
     return Scaffold(
       
       body: PageView(
@@ -42,7 +43,7 @@ int _currentTab = 0;
           SearchScreen(),
           CreatePostScreen(),
           ActivityScreen(),
-          ProfileScreen(userId: widget.userId,),
+          ProfileScreen(userId: Provider.of<UserData>(context).currentUserId),
         ],
         onPageChanged: (int index) {
           setState(() {
