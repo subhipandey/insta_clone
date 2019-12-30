@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:insta_clone/models/user_data.dart';
 import 'package:insta_clone/models/user_model.dart';
 import 'package:insta_clone/screens/profile_screen.dart';
 import 'package:insta_clone/services/database_service.dart';
+import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -26,7 +28,9 @@ class _SearchScreenState extends State<SearchScreen> {
       onTap: () => Navigator.push(
         context, 
         MaterialPageRoute(
-          builder: (_) => ProfileScreen(userId: user.id,
+          builder: (_) => ProfileScreen(
+             currentUserId: Provider.of<UserData>(context).currentUserId,
+            userId: user.id,
           ),
           ),
           ),

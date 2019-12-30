@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
 
-
+ 
 
 
   @override
@@ -33,6 +33,8 @@ int _currentTab = 0;
 
   @override
    Widget build(BuildContext context) {
+
+     final String currentUserId =  Provider.of<UserData>(context).currentUserId;
      
     return Scaffold(
       
@@ -43,7 +45,9 @@ int _currentTab = 0;
           SearchScreen(),
           CreatePostScreen(),
           ActivityScreen(),
-          ProfileScreen(userId: Provider.of<UserData>(context).currentUserId),
+          ProfileScreen(currentUserId: currentUserId , 
+          userId: currentUserId,
+          ),
         ],
         onPageChanged: (int index) {
           setState(() {
