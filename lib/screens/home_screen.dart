@@ -41,11 +41,12 @@ int _currentTab = 0;
       body: PageView(
         controller: _pageController,
         children: <Widget>[
-          FeedScreen(),
+          FeedScreen(currentUserId: currentUserId),
           SearchScreen(),
           CreatePostScreen(),
           ActivityScreen(),
-          ProfileScreen(currentUserId: currentUserId , 
+          ProfileScreen(
+            currentUserId: currentUserId , 
           userId: currentUserId,
           ),
         ],
