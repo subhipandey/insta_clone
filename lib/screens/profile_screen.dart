@@ -4,68 +4,64 @@ import 'package:insta_clone/models/post_model.dart';
 import 'package:insta_clone/models/user_data.dart';
 import 'package:insta_clone/models/user_model.dart';
 import 'package:insta_clone/screens/edit_profile_screen.dart';
+import 'package:insta_clone/services/auth_service.dart';
 import 'package:insta_clone/services/database_service.dart';
 import 'package:insta_clone/utilities/constants.dart';
 import 'package:insta_clone/widgets/post_view.dart';
 import 'package:provider/provider.dart';
 
+import 'comments_screen.dart';
+
 class ProfileScreen extends StatefulWidget {
   final String currentUserId;
   final String userId;
-  
-  ProfileScreen({this.currentUserId,this.userId});
 
-
+  ProfileScreen({this.currentUserId, this.userId});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-
   bool _isFollowing = false;
   int _followerCount = 0;
-  int _followingCount =0;
+  int _followingCount = 0;
   List<Post> _posts = [];
-  int _displayPosts = 0;
+  int _displayPosts = 0; // 0 - grid, 1 - column
   User _profileUser;
 
   @override
-  initState(){
+  void initState() {
     super.initState();
     _setupIsFollowing();
     _setupFollowers();
     _setupFollowing();
     _setupPosts();
     _setupProfileUser();
-    
   }
 
   _setupIsFollowing() async {
     bool isFollowingUser = await DatabaseService.isFollowingUser(
       currentUserId: widget.currentUserId,
       userId: widget.userId,
-      );
-
-      setState(() {
-        _isFollowing = isFollowingUser;
-      });
-
+    );
+    setState(() {
+      _isFollowing = isFollowingUser;
+    });
   }
 
-  _setupFollowers() async{
+  _setupFollowers() async {
     int userFollowerCount = await DatabaseService.numFollowers(widget.userId);
     setState(() {
       _followerCount = userFollowerCount;
     });
   }
 
-  _setupFollowing() async{
-    int  userFollowingCount = await DatabaseService.numFollowers(widget.userId);
+  _setupFollowing() async {
+    int userFollowingCount = await DatabaseService.numFollowing(widget.userId);
     setState(() {
       _followingCount = userFollowingCount;
     });
-
   }
 
   _setupPosts() async {
@@ -84,39 +80,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _followOrUnfollow() {
     if (_isFollowing) {
-
       _unfollowUser();
     } else {
       _followUser();
     }
-    }
+  }
 
-    _unfollowUser() {
-      DatabaseService.unfollowUser(
-        currentUserId: widget.currentUserId, 
-        userId: widget.userId,
-        );
+  _unfollowUser() {
+    DatabaseService.unfollowUser(
+      currentUserId: widget.currentUserId,
+      userId: widget.userId,
+    );
+    setState(() {
+      _isFollowing = false;
+      _followerCount--;
+    });
+  }
 
-        setState(() {
-          _isFollowing = false;
-          _followerCount--;
-        });
-    }
+  _followUser() {
+    DatabaseService.followUser(
+      currentUserId: widget.currentUserId,
+      userId: widget.userId,
+    );
+    setState(() {
+      _isFollowing = true;
+      _followerCount++;
+    });
+  }
 
-    _followUser() {
-      DatabaseService.followUser(
-        currentUserId: widget.currentUserId, 
-        userId: widget.userId,
-        );
-
-        setState(() {
-          _isFollowing = true;
-          _followerCount++;
-        });
-    }
-
-   _displayButton(User user) {
-    return user.id == Provider.of<UserData>(context).currentUserId ? Container(
+  _displayButton(User user) {
+    return user.id == Provider.of<UserData>(context).currentUserId
+        ? Container(
             width: 200.0,
             child: FlatButton(
               onPressed: () => Navigator.push(
@@ -134,7 +128,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(fontSize: 18.0),
               ),
             ),
-          ) : Container(
+          )
+        : Container(
             width: 200.0,
             child: FlatButton(
               onPressed: _followOrUnfollow,
@@ -146,11 +141,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           );
-        
   }
 
   _buildProfileInfo(User user) {
-    return  Column(
+    return Column(
       children: <Widget>[
         Padding(
           padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 0.0),
@@ -250,45 +244,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
   }
+
   _buildToggleButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-    IconButton(
-      icon: Icon(Icons.grid_on),
-      iconSize: 30.0,
-      color: _displayPosts == 0 ? Theme.of(context).primaryColor: Colors.grey[300],
-      onPressed: () => setState(() {
+        IconButton(
+          icon: Icon(Icons.grid_on),
+          iconSize: 30.0,
+          color: _displayPosts == 0
+              ? Theme.of(context).primaryColor
+              : Colors.grey[300],
+          onPressed: () => setState(() {
             _displayPosts = 0;
           }),
-      ),
-      IconButton(
-      icon: Icon(Icons.list),
-      iconSize: 30.0,
-      color: _displayPosts == 1 ? Theme.of(context).primaryColor: Colors.grey[300],
-      onPressed: () => setState(() {
+        ),
+        IconButton(
+          icon: Icon(Icons.list),
+          iconSize: 30.0,
+          color: _displayPosts == 1
+              ? Theme.of(context).primaryColor
+              : Colors.grey[300],
+          onPressed: () => setState(() {
             _displayPosts = 1;
           }),
-      ),
-    ],
+        ),
+      ],
     );
   }
-  _buildTilePost(Post post){
+
+  _buildTilePost(Post post) {
     return GridTile(
-      child: Image(
-      image: CachedNetworkImageProvider(post.imageUrl),
-      fit: BoxFit.cover,
-    ),
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CommentsScreen(
+              post: post,
+              likeCount: post.likeCount,
+            ),
+          ),
+        ),
+        child: Image(
+          image: CachedNetworkImageProvider(post.imageUrl),
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
-  _buildDisplayPost() {
+
+  _buildDisplayPosts() {
     if (_displayPosts == 0) {
-
-      List<GridTile> tiles =[];
-      _posts.forEach((post) => tiles.add(_buildTilePost(post)),
+      // Grid
+      List<GridTile> tiles = [];
+      _posts.forEach(
+        (post) => tiles.add(_buildTilePost(post)),
       );
-
-
       return GridView.count(
         crossAxisCount: 3,
         childAspectRatio: 1.0,
@@ -296,25 +307,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisSpacing: 2.0,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
+        children: tiles,
       );
-
     } else {
+      // Column
       List<PostView> postViews = [];
       _posts.forEach((post) {
-           postViews.add(
-             PostView(currentUserId: widget.currentUserId,
-             post: post,
-             author: _profileUser,
-           )
-           );
+        postViews.add(
+          PostView(
+            currentUserId: widget.currentUserId,
+            post: post,
+            author: _profileUser,
+          ),
+        );
       });
-      return Column(children: postViews,);
+      return Column(children: postViews);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
@@ -325,27 +339,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontSize: 35.0,
           ),
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: AuthService.logout,
+          ),
+        ],
       ),
-      
-     
       body: FutureBuilder(
-        future: userRef.document(widget.userId).get(),
-       builder: (BuildContext context, AsyncSnapshot snapshot) {
+        future: usersRef.document(widget.userId).get(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (!snapshot.hasData) {
             return Center(
               child: CircularProgressIndicator(),
             );
           }
           User user = User.fromDoc(snapshot.data);
-          
-              return ListView(
-          children: <Widget>[
-          _buildProfileInfo(user),
-          _buildToggleButtons(),
-          Divider(),
-          _buildDisplayPost(),
-        ],
-        );
+          return ListView(
+            children: <Widget>[
+              _buildProfileInfo(user),
+              _buildToggleButtons(),
+              Divider(),
+              _buildDisplayPosts(),
+            ],
+          );
         },
       ),
     );

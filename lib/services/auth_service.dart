@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:insta_clone/models/user_data.dart';
 import 'package:provider/provider.dart';
 
-
-class AuthService{
-
+class AuthService {
   static final _auth = FirebaseAuth.instance;
   static final _firestore = Firestore.instance;
 
@@ -16,34 +13,32 @@ class AuthService{
     try {
       AuthResult authResult = await _auth.createUserWithEmailAndPassword(
         email: email,
-        password: password
+        password: password,
       );
       FirebaseUser signedInUser = authResult.user;
       if (signedInUser != null) {
-      _firestore.collection('/users').document(signedInUser.uid).setData({
+        _firestore.collection('/users').document(signedInUser.uid).setData({
           'name': name,
           'email': email,
           'profileImageUrl': '',
         });
         Provider.of<UserData>(context).currentUserId = signedInUser.uid;
-       Navigator.pop(context);
+        Navigator.pop(context);
       }
-     }catch (e){
-       print(e);
-     }
-
+    } catch (e) {
+      print(e);
+    }
   }
- static void logout(){
+
+  static void logout() {
     _auth.signOut();
-    
- }
+  }
 
- static void login(String email, String password) async{
-   try{
-  _auth.signInWithEmailAndPassword(email: email, password: password);
-   } catch (e){
-     print(e);
-   }
- }
-
+  static void login(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+    } catch (e) {
+      print(e);
+    }
+  }
 }

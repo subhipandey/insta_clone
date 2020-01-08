@@ -16,35 +16,36 @@ class _SearchScreenState extends State<SearchScreen> {
   TextEditingController _searchController = TextEditingController();
   Future<QuerySnapshot> _users;
 
-  _buildUserTile(User user){
+  _buildUserTile(User user) {
     return ListTile(
       leading: CircleAvatar(
         radius: 20.0,
-        backgroundImage: user.profileImageUrl.isEmpty 
-        ? AssetImage('aseets/images/user_placeholder.jpg') 
-        : CachedNetworkImageProvider(user.profileImageUrl),
+        backgroundImage: user.profileImageUrl.isEmpty
+            ? AssetImage('assets/images/user_placeholder.jpg')
+            : CachedNetworkImageProvider(user.profileImageUrl),
       ),
       title: Text(user.name),
       onTap: () => Navigator.push(
-        context, 
+        context,
         MaterialPageRoute(
           builder: (_) => ProfileScreen(
-             currentUserId: Provider.of<UserData>(context).currentUserId,
+            currentUserId: Provider.of<UserData>(context).currentUserId,
             userId: user.id,
           ),
-          ),
-          ),
+        ),
+      ),
     );
   }
 
-  _clearSearch(){
+  _clearSearch() {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _searchController.clear());
     setState(() {
       _users = null;
     });
   }
-  
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -53,54 +54,55 @@ class _SearchScreenState extends State<SearchScreen> {
           controller: _searchController,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 15.0),
-            border: InputBorder.none, 
+            border: InputBorder.none,
             hintText: 'Search',
             prefixIcon: Icon(
-              Icons.search, size: 30.0,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.clear
-                  ),
-                  onPressed: () => _clearSearch,
-                  ),
-                  filled: true,
+              Icons.search,
+              size: 30.0,
             ),
-            onSubmitted: (input){
-              if (input.isNotEmpty){
+            suffixIcon: IconButton(
+              icon: Icon(
+                Icons.clear,
+              ),
+              onPressed: _clearSearch,
+            ),
+            filled: true,
+          ),
+          onSubmitted: (input) {
+            if (input.isNotEmpty) {
               setState(() {
                 _users = DatabaseService.searchUsers(input);
               });
-              }
-            },
-          ),
+            }
+          },
         ),
-      body: _users == null ?
-      Center(
-        child: Text('Search for a user'),
-        ) 
-      : FutureBuilder(
-        future: _users, 
-        builder: (context, snapshot) {
-        if (!snapshot.hasData){
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (snapshot.data.document.length == 0){
-          return Center(
-            child: Text('No user found please try again.'),
-          );
-        }
-        return ListView.builder(
-        itemCount: snapshot.data.documents.length,
-        itemBuilder: (BuildContext context, int index) {
-          User user = User.fromDoc(snapshot.data.documents[index]);
-          return _buildUserTile(user);
-        }
-        );
-      },
       ),
+      body: _users == null
+          ? Center(
+              child: Text('Search for a user'),
+            )
+          : FutureBuilder(
+              future: _users,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapshot.data.documents.length == 0) {
+                  return Center(
+                    child: Text('No users found! Please try again.'),
+                  );
+                }
+                return ListView.builder(
+                  itemCount: snapshot.data.documents.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    User user = User.fromDoc(snapshot.data.documents[index]);
+                    return _buildUserTile(user);
+                  },
+                );
+              },
+            ),
     );
   }
 }
